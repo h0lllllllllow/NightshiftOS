@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
-const IMAGE_EXTENSIONS = /\.(png|jpe?g|webp|gif)$/i;
 // Match absolute paths to image files
 const IMAGE_PATH_RE = /((?:\/root\/\.openclaw|\/[\w/.-]+\/\.openclaw)\/(?:workspace|media)\/\S+?\.(png|jpe?g|webp|gif))/gi;
 // Match MEDIA:/path/to/file pattern
@@ -17,9 +17,12 @@ function ImageInline({ src }: { src: string }) {
 
   return (
     <>
-      <img
+      <Image
         src={src}
         alt=""
+        width={900}
+        height={400}
+        unoptimized
         onClick={() => setFullscreen(true)}
         style={{
           maxWidth: "100%",
@@ -28,6 +31,7 @@ function ImageInline({ src }: { src: string }) {
           marginTop: "0.5rem",
           cursor: "pointer",
           border: "1px solid var(--border)",
+          height: "auto",
         }}
       />
       {fullscreen && (
@@ -44,10 +48,13 @@ function ImageInline({ src }: { src: string }) {
             cursor: "zoom-out",
           }}
         >
-          <img
+          <Image
             src={src}
             alt=""
-            style={{ maxWidth: "95vw", maxHeight: "95vh", borderRadius: "0.5rem" }}
+            width={1600}
+            height={900}
+            unoptimized
+            style={{ maxWidth: "95vw", maxHeight: "95vh", borderRadius: "0.5rem", height: "auto" }}
           />
         </div>
       )}

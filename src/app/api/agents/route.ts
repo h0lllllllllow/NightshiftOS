@@ -107,7 +107,7 @@ export async function GET() {
           Date.now() - stat.mtime.getTime() < 5 * 60 * 1000
             ? "online"
             : "offline";
-      } catch (e) {
+      } catch {
         // No recent activity
       }
 

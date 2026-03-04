@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   X,
   Download,
@@ -248,9 +249,12 @@ export function FilePreview({ workspace, path, name, onClose }: FilePreviewProps
 
           {!loading && !error && isImage && (
             <div className="flex items-center justify-center h-full">
-              <img
+              <Image
                 src={`/api/browse?workspace=${encodeURIComponent(workspace)}&path=${encodeURIComponent(path)}&raw=true`}
                 alt={name}
+                width={1200}
+                height={800}
+                unoptimized
                 className="max-w-full max-h-full object-contain rounded-lg"
                 onError={() => setError("Failed to load image")}
               />

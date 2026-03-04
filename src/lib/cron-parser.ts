@@ -200,6 +200,7 @@ export function getNextRuns(
   fromDate: Date = new Date(),
   timezone: string = 'UTC'
 ): Date[] {
+  void timezone;
   const parts = parseCron(expr);
   if (!parts) return [];
 
