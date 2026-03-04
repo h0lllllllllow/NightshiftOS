@@ -24,7 +24,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid workspace or path' }, { status: 400 });
     }
 
-    const { base, fullPath } = resolved;
+    const { fullPath } = resolved;
 
     const filename = path.basename(fullPath);
     if (PROTECTED.includes(filename)) {
