@@ -5,6 +5,8 @@ import os from 'os';
 
 import { OPENCLAW_WORKSPACE, WORKSPACE_IDENTITY } from '@/lib/paths';
 
+const OPENCLAW_CONFIG_PATH = path.join(os.homedir(), '.openclaw', 'openclaw.json');
+
 const WORKSPACE_PATH = OPENCLAW_WORKSPACE;
 const IDENTITY_PATH = WORKSPACE_IDENTITY;
 const ENV_LOCAL_PATH = path.join(process.cwd(), '.env.local');
@@ -23,6 +25,15 @@ function parseIdentityMd(): { name: string; creature: string; emoji: string } {
     };
   } catch {
     return { name: 'OpenClaw Agent', creature: 'AI Agent', emoji: '🤖' };
+  }
+}
+
+function getRuntimeModel(): string {
+  try {
+    const openclawConfig = JSON.parse(fs.readFileSync(OPENCLAW_CONFIG_PATH, 'utf-8'));
+    return openclawConfig?.agents?.defaults?.model?.primary || 'openai-codex/gpt-5.3-codex';
+  } catch {
+    return 'openai-codex/gpt-5.3-codex';
   }
 }
 
@@ -99,7 +110,7 @@ export async function GET() {
   const identity = parseIdentityMd();
   const uptime = process.uptime();
   const nodeVersion = process.version;
-  const model = process.env.OPENCLAW_MODEL || process.env.DEFAULT_MODEL || 'anthropic/claude-sonnet-4';
+  const model = getRuntimeModel();
   
   const systemInfo = {
     agent: {
@@ -125,7 +136,13 @@ export async function GET() {
     timestamp: new Date().toISOString(),
   };
   
-  return NextResponse.json(systemInfo);
+  return NextResponse.json(systemInfo, {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
+    },
+  });
 }
 
 export async function POST(request: Request) {

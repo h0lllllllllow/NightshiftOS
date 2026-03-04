@@ -89,7 +89,7 @@ export function TopBar() {
             onClick={() => setShowSearch(true)}
             className="flex items-center gap-2 transition-all"
             style={{
-              width: "240px",
+              width: "200px",
               height: "32px",
               backgroundColor: "var(--surface-elevated)",
               borderRadius: "6px",
@@ -111,7 +111,7 @@ export function TopBar() {
                 color: "var(--text-muted)",
               }}
             >
-              Search... ⌘K
+              Search... Ctrl+K
             </span>
           </button>
 

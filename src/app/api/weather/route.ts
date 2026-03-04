@@ -5,7 +5,6 @@
  */
 import { NextResponse } from 'next/server';
 
-// Cache weather data for 10 minutes
 let cache: { data: unknown; ts: number } | null = null;
 const CACHE_DURATION = 10 * 60 * 1000;
 
@@ -33,13 +32,23 @@ const WMO_CODES: Record<number, { label: string; emoji: string }> = {
   99: { label: 'Thunderstorm with heavy hail', emoji: '⛈️' },
 };
 
+function cToF(c: number): number {
+  return c * 9 / 5 + 32;
+}
+
 function getWeatherConfig() {
+  const unit: 'C' | 'F' = (process.env.WEATHER_UNIT || 'F').toUpperCase() === 'C' ? 'C' : 'F';
   return {
-    city: process.env.WEATHER_CITY || 'New York',
-    latitude: process.env.WEATHER_LATITUDE || '40.7128',
-    longitude: process.env.WEATHER_LONGITUDE || '-74.0060',
+    city: process.env.WEATHER_CITY || 'Philadelphia',
+    latitude: process.env.WEATHER_LATITUDE || '39.9526',
+    longitude: process.env.WEATHER_LONGITUDE || '-75.1652',
     timezone: process.env.WEATHER_TIMEZONE || 'America/New_York',
+    unit,
   };
+}
+
+function toPreferredTemp(valueC: number, unit: 'C' | 'F'): number {
+  return unit === 'F' ? cToF(valueC) : valueC;
 }
 
 export async function GET() {
@@ -70,8 +79,9 @@ export async function GET() {
 
     const data = {
       city: cfg.city,
-      temp: Math.round(current.temperature_2m),
-      feels_like: Math.round(current.apparent_temperature),
+      unit: cfg.unit,
+      temp: Math.round(toPreferredTemp(current.temperature_2m, cfg.unit)),
+      feels_like: Math.round(toPreferredTemp(current.apparent_temperature, cfg.unit)),
       humidity: current.relative_humidity_2m,
       wind: Math.round(current.wind_speed_10m),
       precipitation: current.precipitation,
@@ -79,8 +89,8 @@ export async function GET() {
       emoji: wmo.emoji,
       forecast: daily.time.slice(0, 3).map((day: string, i: number) => ({
         day,
-        max: Math.round(daily.temperature_2m_max[i]),
-        min: Math.round(daily.temperature_2m_min[i]),
+        max: Math.round(toPreferredTemp(daily.temperature_2m_max[i], cfg.unit)),
+        min: Math.round(toPreferredTemp(daily.temperature_2m_min[i], cfg.unit)),
         emoji: (WMO_CODES[daily.weather_code[i]] || { emoji: '🌡️' }).emoji,
       })),
       updated: new Date().toISOString(),

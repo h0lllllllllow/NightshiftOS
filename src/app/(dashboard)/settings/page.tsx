@@ -40,11 +40,13 @@ interface SystemData {
 export default function SettingsPage() {
   const [systemData, setSystemData] = useState<SystemData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
-  const fetchSystemData = async () => {
+  const fetchSystemData = async (isManual = false) => {
     try {
-      const res = await fetch("/api/system");
+      if (isManual) setRefreshing(true);
+      const res = await fetch(`/api/system?ts=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       setSystemData(data);
       setLastRefresh(new Date());
@@ -52,18 +54,18 @@ export default function SettingsPage() {
       console.error("Failed to fetch system data:", error);
     } finally {
       setLoading(false);
+      if (isManual) setRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchSystemData();
-    const interval = setInterval(fetchSystemData, 30000);
+    const interval = setInterval(() => fetchSystemData(false), 30000);
     return () => clearInterval(interval);
   }, []);
 
   const handleRefresh = () => {
-    setLoading(true);
-    fetchSystemData();
+    fetchSystemData(true);
   };
 
   return (
@@ -85,7 +87,7 @@ export default function SettingsPage() {
 
         <button
           onClick={handleRefresh}
-          disabled={loading}
+          disabled={loading || refreshing}
           className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 w-full sm:w-auto"
           style={{ 
             backgroundColor: "var(--card)", 
@@ -93,7 +95,7 @@ export default function SettingsPage() {
             border: "1px solid var(--border)"
           }}
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`w-4 h-4 ${(loading || refreshing) ? "animate-spin" : ""}`} />
           Refresh
         </button>
       </div>
