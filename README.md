@@ -210,6 +210,16 @@ mission-control.yourdomain.com {
 
 ---
 
+## Smoke Test
+
+Run a quick post-merge health check:
+
+```bash
+./scripts/smoke-test.sh
+```
+
+Also available in GitHub Actions as the `Smoke` workflow.
+
 ## Configuration
 
 ### Agent branding
