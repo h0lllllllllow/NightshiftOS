@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   title: "NightshiftOS - OpenClaw",
   description: "Always on. Always in control.",
   manifest: "/manifest.json",
-  themeColor: "#1a1a2e",
+  themeColor: "#060814",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
