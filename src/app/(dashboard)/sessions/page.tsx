@@ -206,24 +206,21 @@ function SessionDetail({
   session: Session;
   onClose: () => void;
 }) {
+  const hasSessionFile = Boolean(session.sessionId);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(hasSessionFile);
+  const [error, setError] = useState<string | null>(
+    hasSessionFile ? null : "No session file available"
+  );
 
   useEffect(() => {
-    if (!session.sessionId) {
-      setLoading(false);
-      setError("No session file available");
-      return;
-    }
+    if (!session.sessionId) return;
 
-    setLoading(true);
-    setError(null);
     fetch(`/api/sessions?id=${session.sessionId}`)
       .then((r) => r.json())
       .then((data) => {
         setMessages(data.messages || []);
-        if (data.error) setError(data.error);
+        setError(data.error || null);
       })
       .catch(() => setError("Failed to load messages"))
       .finally(() => setLoading(false));
