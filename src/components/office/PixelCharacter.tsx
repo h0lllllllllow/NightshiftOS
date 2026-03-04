@@ -23,14 +23,13 @@ export function PixelCharacter({
   const [typing, setTyping] = useState(false);
 
   useEffect(() => {
-    if (agent.isActive) {
-      const typingInterval = setInterval(() => {
-        setTyping((prev) => !prev);
-      }, 800);
-      return () => clearInterval(typingInterval);
-    } else {
-      setTyping(false);
-    }
+    if (!agent.isActive) return;
+
+    const typingInterval = setInterval(() => {
+      setTyping((prev) => !prev);
+    }, 800);
+
+    return () => clearInterval(typingInterval);
   }, [agent.isActive]);
 
   const getDeskStyle = () => {
@@ -226,7 +225,7 @@ export function PixelCharacter({
           left: deskType === "large" ? "40px" : "30px",
           fontSize: "48px",
           filter: agent.isActive ? "none" : "grayscale(50%) opacity(70%)",
-          animation: typing ? "pixel-typing 0.8s infinite" : "pixel-idle 3s infinite",
+          animation: agent.isActive && typing ? "pixel-typing 0.8s infinite" : "pixel-idle 3s infinite", 
         }}
       >
         {agent.emoji}
